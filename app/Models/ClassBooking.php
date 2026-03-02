@@ -17,6 +17,7 @@ class ClassBooking extends Model
         'status',
         'payment_method',
         'payment_status',
+        'payment_proof',
         'ticket_code',
         'waitlist_position',
         'source',

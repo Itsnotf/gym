@@ -62,3 +62,10 @@ export interface Role {
     updated_at: string;
     permissions?: Permission[];
 }
+
+export interface BankAccount {
+    id: number;
+    bank_name: string;
+    account_name: string;
+    account_number: string;
+}

@@ -12,8 +12,8 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BookOpen, Dumbbell, Users, KeyIcon, LayoutGrid, User, Zap, Clock, ClipboardList, Banknote, Building2, Landmark, Layers, Ticket } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { BookOpen, Dumbbell, Users, KeyIcon, LayoutGrid, User, Zap, Clock, ClipboardList, Banknote, Building2, Landmark, Layers, Ticket, Star, CreditCard } from 'lucide-react';
 import AppLogo from './app-logo';
 import users from '@/routes/users';
 import roles from '@/routes/roles';
@@ -30,6 +30,24 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+];
+
+const memberNavItems: NavItem[] = [
+    {
+        title: 'My Bookings',
+        href: '/my/bookings',
+        icon: ClipboardList,
+    },
+    {
+        title: 'Subscriptions',
+        href: '/my/subscriptions',
+        icon: CreditCard,
+    },
+    {
+        title: 'Trainer Reviews',
+        href: '/my/trainer-reviews',
+        icon: Star,
     },
 ];
 
@@ -54,18 +72,6 @@ const gymManagement: NavItem[] = [
         href: classTypes.index(),
         icon: BookOpen,
         permissions: ['class_types index'],
-    },
-    {
-        title: 'Trainers',
-        href: trainers.index(),
-        icon: Dumbbell,
-        permissions: ['trainers index'],
-    },
-    {
-        title: 'Members',
-        href: members.index(),
-        icon: Users,
-        permissions: ['members index'],
     },
     {
         title: 'Class Sessions',
@@ -120,6 +126,21 @@ const operationsNavItems: NavItem[] = [
     },
 ];
 
+const publicNavItems: NavItem[] = [
+     {
+        title: 'Trainers',
+        href: trainers.index(),
+        icon: Dumbbell,
+        permissions: ['trainers index'],
+    },
+    {
+        title: 'Members',
+        href: members.index(),
+        icon: Users,
+        permissions: ['members index'],
+    },
+];
+
 const footerNavItems: NavItem[] = [
     // {
     //     title: 'Repository',
@@ -129,6 +150,10 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const page = usePage();
+    const userRoles = ((page.props as any).auth?.user?.roles || []) as Array<{ name: string }>;
+    const isMember = userRoles.some((role) => role.name === 'user');
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -145,8 +170,10 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain section='Platform' items={mainNavItems} />
+                {isMember && <NavMain section='My Account' items={memberNavItems} />}
                 <NavMain section='User Management' items={userManagement} />
                 <NavMain section='Gym Management' items={gymManagement} />
+                <NavMain section='Public' items={publicNavItems} />
                 <NavMain section='Operations' items={operationsNavItems} />
             </SidebarContent>
 

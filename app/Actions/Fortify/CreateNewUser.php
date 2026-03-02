@@ -3,6 +3,7 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use App\Models\member;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
@@ -30,10 +31,25 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
+        $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => $input['password'],
         ]);
+
+        // Assign 'user' role to newly registered user
+        $user->assignRole('user');
+
+        // Create member record for the user
+        member::create([
+            'user_id' => $user->id,
+            'membership_status' => 'inactive',
+            'auto_renew' => false,
+            'attendance_count' => 0,
+            'sessions_missed' => 0,
+            'membership_progress' => 0,
+        ]);
+
+        return $user;
     }
 }

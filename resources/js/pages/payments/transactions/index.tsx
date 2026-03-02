@@ -6,6 +6,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Image as ImageIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import adminPaymentTransactions from '@/routes/admin/payment-transactions';
@@ -73,6 +75,7 @@ export default function PaymentTransactionsPage({ pendingTransactions, recentTra
 
     const [notes, setNotes] = useState<Record<number, string>>(initialNotes);
     const [processingId, setProcessingId] = useState<number | null>(null);
+    const [selectedProofUrl, setSelectedProofUrl] = useState<string | null>(null);
 
     useEffect(() => {
         if (flash?.success) {
@@ -124,6 +127,7 @@ export default function PaymentTransactionsPage({ pendingTransactions, recentTra
                                 <TableRow>
                                     <TableHead>Member</TableHead>
                                     <TableHead>Details</TableHead>
+                                    <TableHead>Proof</TableHead>
                                     <TableHead>Notes</TableHead>
                                     <TableHead>Action</TableHead>
                                 </TableRow>
@@ -131,7 +135,7 @@ export default function PaymentTransactionsPage({ pendingTransactions, recentTra
                             <TableBody>
                                 {pendingTransactions.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={4} className="text-center text-muted-foreground">
+                                        <TableCell colSpan={5} className="text-center text-muted-foreground">
                                             Tidak ada transaksi yang menunggu verifikasi.
                                         </TableCell>
                                     </TableRow>
@@ -163,15 +167,18 @@ export default function PaymentTransactionsPage({ pendingTransactions, recentTra
                                                         {transaction.bank_account.bank_name} • {transaction.bank_account.account_number}
                                                     </div>
                                                 )}
-                                                {transaction.proof_path && (
-                                                    <a
-                                                        href={transaction.proof_path}
-                                                        className="text-xs text-primary hover:underline"
-                                                        target="_blank"
-                                                        rel="noreferrer"
+                                            </TableCell>
+                                            <TableCell>
+                                                {transaction.proof_path ? (
+                                                    <button
+                                                        onClick={() => setSelectedProofUrl(transaction.proof_path!)}
+                                                        className="flex items-center gap-1 rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-200"
                                                     >
-                                                        Lihat bukti pembayaran
-                                                    </a>
+                                                        <ImageIcon className="w-4 h-4" />
+                                                        View Proof
+                                                    </button>
+                                                ) : (
+                                                    <span className="text-xs text-slate-400">-</span>
                                                 )}
                                             </TableCell>
                                             <TableCell className="min-w-[220px]">
@@ -260,6 +267,32 @@ export default function PaymentTransactionsPage({ pendingTransactions, recentTra
                         </Table>
                     </CardContent>
                 </Card>
+
+                {/* Payment Proof Modal */}
+                <Dialog open={!!selectedProofUrl} onOpenChange={(open) => !open && setSelectedProofUrl(null)}>
+                    <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                            <DialogTitle>Payment Proof</DialogTitle>
+                        </DialogHeader>
+                        {selectedProofUrl && (
+                            <div className="flex flex-col items-center gap-4">
+                                <img
+                                    src={selectedProofUrl}
+                                    alt="Payment proof"
+                                    className="max-h-[500px] max-w-full rounded-lg border border-slate-200 object-contain"
+                                />
+                                <a
+                                    href={selectedProofUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm text-blue-600 hover:underline"
+                                >
+                                    Open in new tab
+                                </a>
+                            </div>
+                        )}
+                    </DialogContent>
+                </Dialog>
             </div>
         </AppLayout>
     );

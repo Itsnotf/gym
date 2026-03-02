@@ -19,6 +19,7 @@ class StoreSubscriptionRequest extends FormRequest
             'payment_method' => ['required', Rule::in(['transfer', 'cash'])],
             'bank_account_id' => ['nullable', 'required_if:payment_method,transfer', 'exists:bank_accounts,id'],
             'notes' => ['nullable', 'string', 'max:1000'],
+            'proof' => ['nullable', 'required_if:payment_method,transfer', 'file', 'image', 'max:5120', 'mimes:jpg,jpeg,png,pdf'],
         ];
     }
 }

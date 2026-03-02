@@ -6,11 +6,12 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem, type SharedData } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
     Activity,
     CalendarClock,
@@ -18,6 +19,10 @@ import {
     Clock4,
     Layers,
     Ticket,
+    Star,
+    CreditCard,
+    Plus,
+    Building2,
 } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -99,6 +104,14 @@ interface MemberDashboardPayload {
         trainer: string | null;
         notes: string | null;
     }>;
+    weeklySchedules: Array<{
+        id: number;
+        class: string | null;
+        trainer: string | null;
+        day: string;
+        start_time: string;
+        end_time: string;
+    }>;
 }
 
 type Props = SharedData & MemberDashboardPayload;
@@ -109,6 +122,7 @@ export default function MemberDashboard({
     upcomingClassBookings,
     upcomingFacilityBookings,
     recentAttendanceLogs,
+    weeklySchedules,
 }: Props) {
     const attendanceCards = [
         {
@@ -220,6 +234,101 @@ export default function MemberDashboard({
                     </Card>
                 </div>
 
+                {/* Quick Actions */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <Card className="border-sidebar-border/70 dark:border-sidebar-border">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Plus className="size-5 text-blue-500" />
+                                Book a Class
+                            </CardTitle>
+                            <CardDescription>
+                                Reserve your spot in upcoming classes
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground mb-4">
+                                Browse available classes and secure your place.
+                            </p>
+                            <Link href="/my/bookings">
+                                <Button className="w-full" variant="default">
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Book Now
+                                </Button>
+                            </Link>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-sidebar-border/70 dark:border-sidebar-border">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Building2 className="size-5 text-purple-500" />
+                                Book a Facility
+                            </CardTitle>
+                            <CardDescription>
+                                Reserve premium facilities
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground mb-4">
+                                Book studios, courts, and specialty spaces.
+                            </p>
+                            <Link href="/my/bookings">
+                                <Button className="w-full" variant="default">
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Book Now
+                                </Button>
+                            </Link>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-sidebar-border/70 dark:border-sidebar-border">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Star className="size-5 text-yellow-500" />
+                                Rate Your Trainers
+                            </CardTitle>
+                            <CardDescription>
+                                Share feedback about your training experience
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground mb-4">
+                                Help us improve by rating the trainers you've worked with and sharing your experience.
+                            </p>
+                            <Link href="/my/trainer-reviews">
+                                <Button className="w-full">
+                                    <Star className="w-4 h-4 mr-2" />
+                                    Go to Reviews
+                                </Button>
+                            </Link>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-sidebar-border/70 dark:border-sidebar-border">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <CreditCard className="size-5" />
+                                Manage Subscriptions
+                            </CardTitle>
+                            <CardDescription>
+                                Renew or upgrade your gym membership
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground mb-4">
+                                View your current subscription, upgrade your plan, or purchase additional services.
+                            </p>
+                            <Link href="/my/subscriptions">
+                                <Button className="w-full">
+                                    <CreditCard className="w-4 h-4 mr-2" />
+                                    Manage Subscriptions
+                                </Button>
+                            </Link>
+                        </CardContent>
+                    </Card>
+                </div>
+
                 <div className="grid gap-4 lg:grid-cols-2">
                     <Card className="border-sidebar-border/70 dark:border-sidebar-border">
                         <CardHeader>
@@ -306,6 +415,53 @@ export default function MemberDashboard({
                         </CardContent>
                     </Card>
                 </div>
+
+                {/* Weekly Schedule for Active Subscription */}
+                {weeklySchedules && weeklySchedules.length > 0 && (
+                    <Card className="border-sidebar-border/70 dark:border-sidebar-border">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Clock4 className="size-5" />
+                                Weekly Schedule (Your Package)
+                            </CardTitle>
+                            <CardDescription>
+                                Classes included in your active subscription
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Class</TableHead>
+                                        <TableHead>Day</TableHead>
+                                        <TableHead>Time</TableHead>
+                                        <TableHead>Trainer</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {weeklySchedules.map((schedule) => (
+                                        <TableRow key={schedule.id}>
+                                            <TableCell>
+                                                <div className="font-medium">{schedule.class ?? 'TBD'}</div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant="secondary">
+                                                    {schedule.day}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-sm">
+                                                {schedule.start_time} – {schedule.end_time}
+                                            </TableCell>
+                                            <TableCell className="text-sm">
+                                                {schedule.trainer ?? '—'}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                )}
 
                 <Card className="border-sidebar-border/70 dark:border-sidebar-border">
                     <CardHeader>
